@@ -1,0 +1,44 @@
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+libraries:
+- name: webapp2
+  version: latest
+
+handlers:
+- url: /bower_components
+  static_dir: build/unbundled/bower_components
+  secure: always
+
+- url: /images
+  static_dir: build/unbundled/images
+  secure: always
+
+- url: /src
+  static_dir: build/unbundled/src
+  secure: always
+
+- url: /service-worker.js
+  static_files: build/unbundled/service-worker.js
+  upload: build/unbundled/service-worker.js
+  secure: always
+
+- url: /manifest.json
+  static_files: build/unbundled/manifest.json
+  upload: build/unbundled/manifest.json
+  secure: always
+
+- url: /push_manifest.json
+  static_files: build/unbundled/push_manifest.json
+  upload: build/unbundled/push_manifest.json
+  secure: always
+
+# - url: /.*
+#   static_files: build/unbundled/index.html
+#   upload: build/unbundled/index.html
+#   secure: always
+
+- url: /.*
+  script: main.app
+  secure: always

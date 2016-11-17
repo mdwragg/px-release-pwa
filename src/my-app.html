@@ -1,0 +1,138 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/px-theme/px-theme-styles.html">
+<style include="px-theme-styles" is="custom-style"></style>
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/px-app-nav/px-app-nav.html">
+<link rel="import" href="../bower_components/px-card/px-card.html">
+<link rel="import" href="../bower_components/px-vis-timeseries/px-vis-timeseries.html">
+
+
+<dom-module id="my-app">
+  <template>
+    <style>
+      :host {
+        --app-primary-color: #4285f4;
+        --app-secondary-color: black;
+
+        display: block;
+      }
+      .content-wrapper {
+        position: relative;
+        display: flex;
+      }
+      app-header {
+        color: #fff;
+        background-color: var(--app-primary-color);
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+
+        padding: 0 16px;
+
+        text-decoration: none;
+
+        color: var(--app-secondary-color);
+
+        line-height: 40px;
+      }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    <app-drawer-layout fullbleed>
+      <!-- Drawer content -->
+      <app-drawer>
+        <px-app-nav nav-items='[{"path":"tab1","icon":"fa-exclamation-triangle","eventName":"firstItem","label":"Alerts","subitems":[{"label":"Sub Category 1","href":null,"class":"","subitemclass":"","subitemlistclass":"","selected":false},{"label":"Sub Category 2","eventName":"subitemTwo","href":null,"class":"","subitemclass":"","subitemlistclass":"","selected":false},{"label":"Sub Category 3","path":"subitem3","href":"#subitem3","class":"","subitemclass":"","subitemlistclass":"","selected":false}],"href":"#tab1","class":"","subitemclass":"visuallyhidden","subitemlistclass":"visuallyhidden list-bare","selected":false,"subSelected":false},{"path":"tab2","icon":"fa-briefcase","label":"Cases","subitems":[{"label":"Sub Category 1","href":null,"class":"","subitemclass":"","subitemlistclass":"","selected":false},{"label":"Sub Category 2","href":null,"class":"","subitemclass":"","subitemlistclass":"","selected":false},{"label":"Sub Category 3","href":null,"class":"","subitemclass":"","subitemlistclass":"","selected":false}],"href":"#tab2","class":"","subitemclass":"visuallyhidden","subitemlistclass":"visuallyhidden list-bare","selected":false,"subSelected":false},{"path":"tab3","icon":"fa-bar-chart","label":"Analysis","href":"#tab3","class":"","subitemclass":"visuallyhidden","subitemlistclass":"visuallyhidden list-bare","selected":false,"subSelected":false},{"path":"tab4","icon":"fa-tachometer","label":"Dashboards","href":"#tab4","class":"","subitemclass":"visuallyhidden","subitemlistclass":"visuallyhidden list-bare","selected":false,"subSelected":false}]'></px-app-nav>      </app-drawer>
+
+      <px-card icon='demo-icon' header-text='Demo Card' chevron>
+        <p>Hello</p>
+        <px-vis-timeseries
+          height="300"
+          width="800"
+          prevent-resize="true"
+          selection-type="xy"
+          register-location="top"
+          chart-data='[{"x":1397177400000,"y0":"0.0","y1":"2.0"},{"x":1397228040000,"y0":"0.897","y1":"2.5"},{"x":1397248260000,"y0":"1.0","y1":"3.5"},{"x":1397291280000,"y0":"2.0","y1":"1.5"},{"x":1397318100000,"y0":"1.5","y1":"0.5"},{"x":1397342100000,"y0":"3.0","y1":"2.0"},{"x":1397390820000,"y0":"0.897","y1":"1.5"}]' include-all-series="true"></px-vis-timeseries>
+      </px-card>
+
+      <!-- Main content -->
+      <!-- <app-header-layout has-scrolling-region>
+
+        <app-header condenses reveals effects="waterfall">
+          <app-toolbar>
+            <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+            <div main-title>My App</div>
+          </app-toolbar>
+        </app-header>
+
+        <iron-pages
+            selected="[[page]]"
+            attr-for-selected="name"
+            fallback-selection="view404"
+            role="main">
+          <my-view1 name="view1"></my-view1>
+          <my-view404 name="view404"></my-view404>
+        </iron-pages>
+      </app-header-layout> -->
+    </app-drawer-layout>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-app',
+
+      properties: {
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged'
+        }
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)'
+      ],
+
+      _routePageChanged: function(page) {
+        this.page = page || 'view1';
+      },
+
+      _pageChanged: function(page) {
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+      },
+
+      _showPage404: function() {
+        this.page = 'view404';
+      }
+    });
+  </script>
+</dom-module>
